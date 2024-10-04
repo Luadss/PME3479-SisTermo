@@ -1,0 +1,241 @@
+#### (2023 A12) Avaliação Parcial 12
+
+### Questão 1
+# Uma turbina a gás industrial utiliza metano (CH4 / PCI= 50000 kJ/kg) como combustível e é queimado com 190% de excesso de ar. Metano é fornecido numa linha a PC = 410 kPa e TC = 25 OC, passa por um compressor “booster”, sendo comprimido com eficiência isentrópica de 0.84 até a pressão do combustor. Ar ambiente entra no compressor a PA = 100 kPa e TA = 25 OC. A relação de pressão no compressor da turbina é de 13 e a sua eficiência isentrópica é de 0.83. Um gerador elétrico, acoplado ao eixo da turbina a gás, produz 95000 kW de potência elétrica. A eficiência isentrópica da turbina é de 0.89. 
+# Considere os seguintes dados: Tref (PCI) = 25 OC, k=1.3 (metano), k = 1.4 (ar, gases de combustão), Cp médio: Cp,metano = 2.25 kJ/kg K (booster), Cp,ar = 1.0 kJ/kg K (compressor), Cp,gas,comb = 1.28 kJ/kg K (combustor), Cp,gas,tur = 1.15 kJ/kg k (turbina).
+
+# Nestas condições, determine: 
+# (a) Razão ar-combustível [kgar seco / kgmetano]
+# (b) Temperatura na saída do compressor da turbina TB [K]
+# (c) Temperatura na saída do compressor “booster” TD [K]
+# (d) Temperatura na saída do combustor TE [K]
+# (e) Temperatura na saída da turbina a gás TF [K]
+# (f) Vazão de metano [kg/s]
+# (g) Vazão dos gases na turbina a gás [kg/s] 
+
+## Do enunciado:
+PCI_CH4 = 50000e3	# J/kg
+exar_CH4 = 1.9
+Tref = 25+273	# K
+k_CH4 = 1.3
+k_ar = 1.4
+k_g = 1.4
+Cp_CH4 = 2.25e3	#J/kgK
+Cp_ar = 1e3	#J/kgK
+Cp_gcomb = 1.28e3	#J/kgK
+Cp_gturb = 1.15e3	#J/kgK
+
+## Reação química:
+# CH4 + vO2*2*(02+3.76*N2) -> C02+2*H2O+(vO2-1)*2*O2+vO2*2*3.76*N2
+vO2_CH4 = 1+exar_CH4
+RAC_CH4 = 2*vO2_CH4*(1+3.76)*28.97/16
+
+# fluxo de ar e gás
+mdot_ar = RAC_CH4*mdot_CH4
+mdot_g = (RAC_CH4+1)*mdot_CH4
+
+## Estados termodinâmicos
+
+# a - entrada ar ambiente
+pa = 100e3	# Pa
+TaC = 25	# °C
+Ta = TaC+274	# K
+
+# compressor da turbina a-b
+rp_ab = 13
+
+eta_comp_ab = 0.83
+eta_comp_ab*(Tb-Ta) = Tbs-Ta
+wcomp = Cp_ar*(Ta-Tb)
+Wcomp = mdot_ar*wcomp
+
+expk_ar = (1-k_ar)/k_ar 
+Ta*pa^expk_ar = Tbs*pb^expk_ar
+
+# b - linha de ar para combustão
+pb = rp_ab*pa
+Tb = TbC+273
+
+# c - entrada de metano
+pc = 410e3	# Pa
+TcC = 25	# °C
+Tc = TcC+273	# K
+
+# compressor metano c-d
+eta_comp_cd = 0.84
+eta_comp_cd*(Td-Tc) = Tds-Tc
+
+expk_CH4 = (1-k_CH4)/k_CH4 
+Tc*pc^expk_CH4 = Tds*pd^expk_CH4
+
+wboost = Cp_CH4*(Td-Tc)
+Wboost = mdot_CH4*wboost
+
+# d - linha de metano para combustão
+pd = pb	# Pa
+Td = TdC+273
+
+# câmara de combustão cd-e
+PCI_CH4 + RAC_CH4*Cp_ar*(Tb-Tref) + Cp_CH4*(Td-Tref) = (RAC_CH4+1)*Cp_gcomb*(Te-Tref)
+
+# e - saída da combustão
+pe = pb
+Te = TeC+273
+
+# turbina e-f
+eta_turb_ef = 0.89
+eta_turb_ef*(Tfs-Te) = Tf-Te
+wtg = Cp_gturb*(Tf-Te)
+Wtg = mdot_g*wtg
+
+expk_g = (1-k_g)/k_g 
+Te*pe^expk_g = Tfs*pf^expk_g
+
+# f - saída da turbina
+pf = pe/rp_ab
+Tf = TfC+273
+
+# gerador elétrico no eixo da turbina a gás
+Wtgliq = 95e6	# W
+Wtgliq = Wcomp-Wtg
+
+
+
+### Qustão 2
+# A turbina a gás descrita acima está acoplada a uma caldeira de recuperação com queima suplementar que gera vapor superaquecido para uma turbina a vapor. Considere que óleo combustível de PCI (Tent=Tref = 25 oC) = 42000 kJ/kgoleo é consumido na queima suplementar de tal forma que todo o oxigênio excedente (na saída da turbina a gás) é utilizado nesta queima. A relação de massa de ar de combustão do óleo combustível é de RACar,oleo = 20 kgar seco/ kgoleo. A temperatura dos gases na saída da caldeira de recuperação é de TG = 450 oC. 
+# Considere Cpgas,rec = 1.19 kJ/kg k na caldeira de recuperação.  
+
+# Nestas condições, determine:
+# (h) Vazão de óleo combustível (kg/s)
+# (i) Temperatura máxima (adiabática) dos gases na fornalha [K]
+# (j) Calor fornecido ao vapor pela caldeira de recuperação [kW]
+
+## Do enunciado
+PCI_oleo = 42000e3	#J/kg
+RAC_oleo = 20	#kgar/kgoleo
+Cp_grec = 1.19e3	#J/kgK
+
+## Reação química 
+# Reação -> queima todo o ar restante
+RAC_CH4esteq = 2*(1+3.76)*28.97/16
+mdot_ar_restante = mdot_ar-RAC_CH4esteq*mdot_CH4
+mdot_oleo = mdot_ar_restante/RAC_oleo
+mdot_grec = mdot_g+mdot_oleo
+
+## Estados termodinâmicos
+# caldeira de recuperação f-g
+mdot_g*Cp_gturb*(Tf-Tref) + mdot_oleo*PCI_oleo = mdot_grec*Cp_grec*(Tgad-Tref)
+Qcald = mdot_grec*Cp_grec*(Tgad-Tg)
+
+# g - saída da caldeira de recuperação
+TgC = 450	#°C
+Tg = TgC+273
+
+
+### Questão 3
+# Considere que a temperatura do vapor na saída da caldeira de recuperação é T3  = 400 OC e a pressão P3  = 6 MPa. 85% do vapor gerado na caldeira de recuperação é utilizado para acionar uma turbina de condensação e o restante do vapor é utilizado para fornecer calor para um chiller de absorção. O vapor da linha do chiller de absorção retorna como líquido saturado à pressão de P7 =200 kPa. O chiller de absorção tem COP de 0.9 e produz água gelada que entra no chiller a T8 =12 OC e sai a T9 =7 OC. A bomba B1 é alimentada com líquido saturado vindo do condensador à pressão de P4 = P5  =10 kPa e descarrega o líquido à pressão P6  = 200 kPa. Esta corrente é misturada com o retorno do processo industrial e do chiller e entra na bomba B2  à pressão P1  = 200 kPa, que comprime esta corrente até a pressão de operação da caldeira. A eficiência isentrópica da bomba é de 0.82 e da turbina é de 0.88. 
+
+# Nestas condições, determine: 
+# (k) Entalpia da água na entrada da segunda bomba (h1) [kJ/kg] 
+# (l) Vazão em massa de vapor d’água [kg/s]
+# (m) Potência da turbina a vapor [kW]
+# (n) Potência total das bombas, em módulo [kW]
+# (o) Potência líquida do ciclo combinado, considerando que a energia para acionar o compressor “booster” é retirada do gerador elétrico deste sistema [kW]
+# (p) Capacidade frigorífica do chiller de absorção, em modulo [kW]
+# (q) Vazão mássica de água gelada [kg/s]
+# (r) Rendimento térmico global do ciclo combinado de cogeração [%] 
+
+## Do enunciado
+frac_tv = 0.85
+eta_bomba = 0.82
+eta_tv = 0.88
+
+
+## Estados termodinâmicos
+# ciclo global
+WB = WB1+WB2
+Wtvliq = Wtv + WB1 + WB2
+Wliq = Wtgliq + Wtvliq + Wboost
+eta_ciclo = (Wliq+abs(Qchiller))/(mdot_CH4*PCI_CH4+mdot_oleo*PCI_oleo)
+
+# chiller de absorção 3-7
+qproc = h7-h3
+Qproc = mdot_vap*(1-frac_tv)*qproc
+COP = 0.9
+Qchiller = Qproc*COP
+
+# resfriamento de água gelada
+p8 = 100e3
+T8 = 12+273
+h8 = PropsSI('H','T',T8,'P',p8,'Water')
+p9 = p8
+T9 = 7+273
+h9 = PropsSI('H','T',T9,'P',p9,'Water')
+
+h8+qchiller = h9
+Qchiller = mdot_aguagelada*qchiller
+
+# 1 -
+p1 = 200e3
+h1 = frac_tv*h6 + (1-frac_tv)*h7
+
+s1 = PropsSI('S','H',h1,'P',p1,'Water')
+
+# bomba B2 1-2
+eta_bomba*(h2-h1) = h2s-h1
+wB2 = h1-h2
+WB2 = mdot_vap*wB2
+
+# 2 -
+p2 = 5e6
+
+s2s = s1
+h2s = PropsSI('H','S',s2s,'P',p2,'Water')
+
+# caldeira de recuperação 2-3
+Qcald = mdot_vap*(h3-h2)
+
+# 3 - vapor na saída da caldeira de recuperação
+p3 = 6e6	#Pa
+T3C = 400	#°C
+T3 = T3C+273	#K
+
+h3 = PropsSI('H','T',T3,'P',p3,'Water')
+s3 = PropsSI('S','T',T3,'P',p3,'Water')
+
+# turbina vapor 3-4
+eta_tv*(h4s-h3) = h4-h3
+wtv = h3-h4
+Wtv = frac_tv*mdot_vap*wtv
+
+# 4 -
+p4 = 10e3
+
+s4s = s3
+h4s = PropsSI('H','S',s4s,'P',p4,'Water')
+
+# condensador 4-5
+
+# 5 -
+p5 = p4
+x5 = 0
+
+h5 = PropsSI('H','Q',x5,'P',p5,'Water')
+s5 = PropsSI('S','Q',x5,'P',p5,'Water')
+
+# bomba B1 5-6
+eta_bomba*(h6-h5) = h6s-h5
+wB1 = h5-h6
+WB1 = frac_tv*mdot_vap*wB1
+
+# 6 -
+p6 = 200e3
+
+s6s = s5
+h6s = PropsSI('H','S',s6s,'P',p6,'Water')
+
+# 7 - saída processo industrial
+p7 = 200e3
+x7 = 0
+
+h7 = PropsSI('H','Q',x7,'P',p7,'Water')

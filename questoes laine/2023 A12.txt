@@ -1,4 +1,6 @@
 #### (2023 A12) Avaliação Parcial 12
+# As questões (n,o,r) estão erradas, não descobri porque...
+# O resto acertei =D
 
 ### Questão 1
 # Uma turbina a gás industrial utiliza metano (CH4 / PCI= 50000 kJ/kg) como combustível e é queimado com 190% de excesso de ar. Metano é fornecido numa linha a PC = 410 kPa e TC = 25 OC, passa por um compressor “booster”, sendo comprimido com eficiência isentrópica de 0.84 até a pressão do combustor. Ar ambiente entra no compressor a PA = 100 kPa e TA = 25 OC. A relação de pressão no compressor da turbina é de 13 e a sua eficiência isentrópica é de 0.83. Um gerador elétrico, acoplado ao eixo da turbina a gás, produz 95000 kW de potência elétrica. A eficiência isentrópica da turbina é de 0.89. 

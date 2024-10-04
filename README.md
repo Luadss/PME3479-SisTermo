@@ -1,1 +1,1 @@
-# PME3479-SisTermo
+# PME3479 - Sistemas Térmicos
